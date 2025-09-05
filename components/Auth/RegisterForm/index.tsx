@@ -28,6 +28,7 @@ import {
   FormMessage,
   FormDescription,
 } from '@/components/ui/form';
+import { useRouter } from 'next/navigation';
 
 export const RegisterForm = ({
   className,
@@ -43,6 +44,8 @@ export const RegisterForm = ({
     },
   });
 
+  const router = useRouter();
+
   const onSubmit = async (data: RegisterFormInputs) => {
     try {
       const result = await signUp(data.email, data.password, data.name);
@@ -51,7 +54,7 @@ export const RegisterForm = ({
         toast.error(result.message);
       } else {
         toast.success('Usuario registrado exitosamente');
-        window.location.href = '/dashboard';
+        router.push('/dashboard');
       }
     } catch (error) {
       toast.error('Ocurrió un error inesperado');

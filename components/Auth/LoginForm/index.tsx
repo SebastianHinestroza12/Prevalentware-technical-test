@@ -24,6 +24,7 @@ import {
   FormControl,
   FormMessage,
 } from '@/components/ui/form';
+import { useRouter } from 'next/navigation';
 
 export const LoginForm = ({
   className,
@@ -37,6 +38,7 @@ export const LoginForm = ({
       password: '',
     },
   });
+  const router = useRouter();
 
   const onSubmit = async (data: LoginFormInputs) => {
     const result = await signIn(data.email, data.password);
@@ -45,7 +47,7 @@ export const LoginForm = ({
       toast.error(result.message);
     } else {
       toast.success('¡Has iniciado sesión exitosamente!');
-      window.location.href = '/dashboard';
+      router.push('/dashboard');
     }
   };
 
