@@ -10,7 +10,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { signUp } from '@/server/user';
 import { useForm } from 'react-hook-form';
@@ -20,18 +19,28 @@ import {
   registerSchema,
   RegisterFormInputs,
 } from '@/lib/validation/authSchema';
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+  FormDescription,
+} from '@/components/ui/form';
 
 export const RegisterForm = ({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<'div'>) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<RegisterFormInputs>({
+  const form = useForm<RegisterFormInputs>({
     resolver: zodResolver(registerSchema),
     mode: 'onChange',
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+    },
   });
 
   const onSubmit = async (data: RegisterFormInputs) => {
@@ -59,50 +68,86 @@ export const RegisterForm = ({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className='grid gap-6'>
-            <div className='grid gap-2'>
-              <Label htmlFor='name'>
-                Nombre <span className='text-red-500'>*</span>
-              </Label>
-              <Input id='name' type='text' {...register('name')} />
-              {errors.name && (
-                <p className='text-red-500 text-sm'>{errors.name.message}</p>
-              )}
-            </div>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='grid gap-6'>
+              {/* Name */}
+              <FormField
+                control={form.control}
+                name='name'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Nombre <span className='text-red-500'>*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder='Tu nombre' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div className='grid gap-2'>
-              <Label htmlFor='email'>
-                Correo electrónico <span className='text-red-500'>*</span>
-              </Label>
-              <Input id='email' type='email' {...register('email')} />
-              {errors.email && (
-                <p className='text-red-500 text-sm'>{errors.email.message}</p>
-              )}
-            </div>
+              {/* Email */}
+              <FormField
+                control={form.control}
+                name='email'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Correo electrónico <span className='text-red-500'>*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder='correo@ejemplo.com' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div className='grid gap-2'>
-              <Label htmlFor='password'>
-                Contraseña <span className='text-red-500'>*</span>
-              </Label>
-              <Input id='password' type='password' {...register('password')} />
-              {errors.password && (
-                <p className='text-red-500 text-sm'>
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
+              {/* Password */}
+              <FormField
+                control={form.control}
+                name='password'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Contraseña <span className='text-red-500'>*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type='password'
+                        placeholder='********'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                    <FormDescription>
+                      La contraseña debe tener al menos 8 caracteres, una
+                      mayúscula, una minúscula, un número y un carácter
+                      especial.
+                    </FormDescription>
+                  </FormItem>
+                )}
+              />
 
-            <Button type='submit' className='w-full' disabled={isSubmitting}>
-              {isSubmitting ? 'Cargando...' : 'Registrarse'}
-            </Button>
+              {/* Submit */}
+              <Button
+                type='submit'
+                className='w-full'
+                disabled={form.formState.isSubmitting}
+              >
+                {form.formState.isSubmitting ? 'Cargando...' : 'Registrarse'}
+              </Button>
 
-            <div className='text-center text-sm'>
-              ¿Ya tienes una cuenta?{' '}
-              <Link href='/login' className='underline underline-offset-4'>
-                Inicia sesión
-              </Link>
-            </div>
-          </form>
+              {/* Login link */}
+              <div className='text-center text-sm'>
+                ¿Ya tienes una cuenta?{' '}
+                <Link href='/login' className='underline underline-offset-4'>
+                  Inicia sesión
+                </Link>
+              </div>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>
