@@ -25,6 +25,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { useRouter } from 'next/navigation';
+import { authClient } from '@/lib/auth/client';
 
 export const LoginForm = ({
   className,
@@ -51,6 +52,17 @@ export const LoginForm = ({
     }
   };
 
+  const handleGithubSignIn = async () => {
+    try {
+      const data = await authClient.signIn.social({ provider: 'github' });
+
+      if (data) toast.success('¡Has iniciado sesión con GitHub!');
+    } catch (error) {
+      const e = error as Error;
+      toast.error(e.message || 'Error al iniciar sesión con GitHub');
+    }
+  };
+
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
@@ -67,7 +79,7 @@ export const LoginForm = ({
                 <Button
                   variant='outline'
                   className='w-full'
-                  onClick={() => (window.location.href = '/api/auth/github')}
+                  onClick={handleGithubSignIn}
                 >
                   Iniciar con GitHub
                 </Button>
