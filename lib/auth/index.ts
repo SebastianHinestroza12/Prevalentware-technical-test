@@ -21,6 +21,10 @@ export const auth = betterAuth({
       role: { type: 'string' },
     },
   },
+  session: {
+    // 1 día en segundos
+    expiresIn: 60 * 60 * 24,
+  },
   plugins: [nextCookies()],
 });
 
