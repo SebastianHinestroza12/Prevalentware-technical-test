@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -29,6 +30,7 @@ import {
   FormDescription,
 } from '@/components/ui/form';
 import { useRouter } from 'next/navigation';
+import { Eye, EyeOff } from 'lucide-react';
 
 export const RegisterForm = ({
   className,
@@ -45,6 +47,8 @@ export const RegisterForm = ({
   });
 
   const router = useRouter();
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (data: RegisterFormInputs) => {
     try {
@@ -119,11 +123,24 @@ export const RegisterForm = ({
                       Contraseña <span className='text-red-500'>*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        type='password'
-                        placeholder='********'
-                        {...field}
-                      />
+                      <div className='relative'>
+                        <Input
+                          type={showPassword ? 'text' : 'password'}
+                          placeholder='********'
+                          {...field}
+                        />
+                        <button
+                          type='button'
+                          className='absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-emerald-600'
+                          onClick={() => setShowPassword((prev) => !prev)}
+                        >
+                          {showPassword ? (
+                            <EyeOff className='w-5 h-5' />
+                          ) : (
+                            <Eye className='w-5 h-5' />
+                          )}
+                        </button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                     <FormDescription className='text-xs text-muted-foreground'>

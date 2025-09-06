@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/form';
 import { useRouter } from 'next/navigation';
 import { authClient } from '@/lib/auth/client';
-import { Github } from 'lucide-react';
+import { Github, Eye, EyeOff } from 'lucide-react';
 
 export const LoginForm = ({
   className,
@@ -42,6 +42,8 @@ export const LoginForm = ({
     },
   });
   const router = useRouter();
+
+  const [showPassword, setShowPassword] = useState(false);
   const [isGithubLoading, setIsGithubLoading] = useState(false);
 
   const onSubmit = async (data: LoginFormInputs) => {
@@ -128,6 +130,7 @@ export const LoginForm = ({
               />
 
               {/* Password */}
+              {/* Password */}
               <FormField
                 control={form.control}
                 name='password'
@@ -145,11 +148,24 @@ export const LoginForm = ({
                       </Link>
                     </div>
                     <FormControl>
-                      <Input
-                        type='password'
-                        placeholder='********'
-                        {...field}
-                      />
+                      <div className='relative'>
+                        <Input
+                          type={showPassword ? 'text' : 'password'}
+                          placeholder='********'
+                          {...field}
+                        />
+                        <button
+                          type='button'
+                          className='absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-emerald-600'
+                          onClick={() => setShowPassword((prev) => !prev)}
+                        >
+                          {showPassword ? (
+                            <EyeOff className='w-5 h-5' />
+                          ) : (
+                            <Eye className='w-5 h-5' />
+                          )}
+                        </button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
