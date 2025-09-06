@@ -54,7 +54,7 @@ export const RegisterForm = ({
         toast.error(result.message);
       } else {
         toast.success('¡Cuenta creada exitosamente!');
-        router.push('/dashboard');
+        router.push('/home');
       }
     } catch (error) {
       toast.error('Ocurrió un error inesperado');
