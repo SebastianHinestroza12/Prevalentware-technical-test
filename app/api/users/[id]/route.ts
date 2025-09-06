@@ -7,8 +7,8 @@ type RouteParams = {
   params: { id: string };
 };
 
-export const DELETE = async (req: Request, { params }: RouteParams) => {
-  const authCheck = await withAuth(req, ['users:delete']);
+export const GET = async (req: Request, { params }: RouteParams) => {
+  const authCheck = await withAuth(req, ['users:read']);
   if (!authCheck.authorized) return authCheck.response;
 
   try {
@@ -18,31 +18,54 @@ export const DELETE = async (req: Request, { params }: RouteParams) => {
       return Response.json({ message: 'User ID is required' }, { status: 400 });
     }
 
-    await prisma.user.delete({
+    const user = await prisma.user.findUnique({
       where: { id },
+      include: { movements: true, role: true },
     });
 
-    return Response.json(null, { status: 204 });
+    if (!user) {
+      return Response.json({ message: 'User not found' }, { status: 404 });
+    }
+
+    return Response.json({ data: user });
   } catch (error) {
-    console.error('Error deleting user:', error);
+    console.error('Error fetching users:', error);
     return Response.json({ message: 'Internal Server Error' }, { status: 500 });
   }
 };
 
-export const PUT = async (req: Request, { params }: RouteParams) => {
+export const PUT = async (
+  req: Request,
+  { params }: { params: { id: string } }
+) => {
   const authCheck = await withAuth(req, ['users:update']);
   if (!authCheck.authorized) return authCheck.response;
 
   try {
-    const { id } = params;
+    const id = params.id;
 
     if (!id) {
       return Response.json({ message: 'User ID is required' }, { status: 400 });
     }
 
-    const body = await req.json();
-    const validation = validateSchema(updateUserSchema, body);
+    const user = await prisma.user.findUnique({ where: { id } });
 
+    if (!user) {
+      return Response.json({ message: 'User not found' }, { status: 404 });
+    }
+
+    let body;
+
+    try {
+      body = await req.json();
+    } catch {
+      return Response.json(
+        { message: 'Request body is required' },
+        { status: 400 }
+      );
+    }
+
+    const validation = validateSchema(updateUserSchema, body);
     if (!validation.success) {
       return Response.json(
         { message: 'Validation failed', errors: validation.errors },
@@ -66,3 +89,4 @@ export const PUT = async (req: Request, { params }: RouteParams) => {
     return Response.json({ message: 'Internal Server Error' }, { status: 500 });
   }
 };
+

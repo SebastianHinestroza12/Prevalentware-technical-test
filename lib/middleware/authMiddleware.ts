@@ -45,7 +45,13 @@ export async function withAuth(
   if (!user || !user.role) {
     return {
       authorized: false,
-      response: Response.json({ message: 'Forbidden' }, { status: 403 }),
+      response: Response.json(
+        {
+          message:
+            'You do not have permission to access this resource. Forbidden.',
+        },
+        { status: 403 }
+      ),
     };
   }
 
