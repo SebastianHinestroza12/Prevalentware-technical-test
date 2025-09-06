@@ -51,7 +51,7 @@ export const LoginForm = ({
       toast.error(result.message);
     } else {
       toast.success('¡Sesión iniciada con éxito!');
-      router.push('/dashboard');
+      router.push('/home');
     }
   };
 
@@ -60,6 +60,7 @@ export const LoginForm = ({
       setIsGithubLoading(true);
       const data = await authClient.signIn.social({
         provider: 'github',
+        callbackURL: `${window.location.origin}/home`,
       });
 
       if (data) toast.success('¡Has iniciado sesión con GitHub!');
