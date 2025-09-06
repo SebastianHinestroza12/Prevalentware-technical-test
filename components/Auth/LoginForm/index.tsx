@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,6 +27,7 @@ import {
 } from '@/components/ui/form';
 import { useRouter } from 'next/navigation';
 import { authClient } from '@/lib/auth/client';
+import { Github } from 'lucide-react';
 
 export const LoginForm = ({
   className,
@@ -40,6 +42,7 @@ export const LoginForm = ({
     },
   });
   const router = useRouter();
+  const [isGithubLoading, setIsGithubLoading] = useState(false);
 
   const onSubmit = async (data: LoginFormInputs) => {
     const result = await signIn(data.email, data.password);
@@ -47,19 +50,24 @@ export const LoginForm = ({
     if (!result.success) {
       toast.error(result.message);
     } else {
-      toast.success('¡Has iniciado sesión exitosamente!');
+      toast.success('¡Sesión iniciada con éxito!');
       router.push('/dashboard');
     }
   };
 
   const handleGithubSignIn = async () => {
     try {
-      const data = await authClient.signIn.social({ provider: 'github' });
+      setIsGithubLoading(true);
+      const data = await authClient.signIn.social({
+        provider: 'github',
+      });
 
       if (data) toast.success('¡Has iniciado sesión con GitHub!');
     } catch (error) {
       const e = error as Error;
       toast.error(e.message || 'Error al iniciar sesión con GitHub');
+    } finally {
+      setIsGithubLoading(false);
     }
   };
 
@@ -67,27 +75,37 @@ export const LoginForm = ({
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader className='text-center'>
-          <CardTitle className='text-xl'>Bienvenido de nuevo</CardTitle>
+          <CardTitle className='text-xl font-bold text-emerald-600'>
+            Accede a tu cuenta
+          </CardTitle>
           <CardDescription>
-            Inicia sesión con tu cuenta de GitHub
+            Gestiona tus ingresos, egresos y costos en un solo lugar
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className='grid gap-6'>
+              {/* GitHub login */}
               <div className='flex flex-col gap-4'>
                 <Button
+                  type='button'
                   variant='outline'
-                  className='w-full'
+                  className='w-full flex items-center gap-2'
                   onClick={handleGithubSignIn}
+                  disabled={isGithubLoading}
                 >
-                  Iniciar con GitHub
+                  {isGithubLoading ? (
+                    <span className='animate-spin border-2 border-gray-400 border-t-transparent rounded-full w-4 h-4' />
+                  ) : (
+                    <Github className='w-4 h-4' />
+                  )}
+                  {isGithubLoading ? 'Conectando...' : 'Continuar con GitHub'}
                 </Button>
               </div>
 
               <div className='relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border'>
                 <span className='relative z-10 bg-background px-2 text-muted-foreground'>
-                  O continuar con correo electrónico
+                  O inicia con tu correo electrónico
                 </span>
               </div>
 
@@ -120,7 +138,7 @@ export const LoginForm = ({
                       </FormLabel>
                       <Link
                         href='#'
-                        className='text-sm underline-offset-4 hover:underline'
+                        className='text-sm text-emerald-600 hover:underline'
                       >
                         ¿Olvidaste tu contraseña?
                       </Link>
@@ -140,7 +158,7 @@ export const LoginForm = ({
               {/* Submit */}
               <Button
                 type='submit'
-                className='w-full'
+                className='w-full bg-emerald-600 hover:bg-emerald-700 text-white'
                 disabled={form.formState.isSubmitting}
               >
                 {form.formState.isSubmitting ? 'Cargando...' : 'Iniciar sesión'}
@@ -149,7 +167,10 @@ export const LoginForm = ({
               {/* Register link */}
               <div className='text-center text-sm'>
                 ¿No tienes una cuenta?{' '}
-                <Link href='/register' className='underline underline-offset-4'>
+                <Link
+                  href='/register'
+                  className='text-emerald-600 hover:underline'
+                >
                   Regístrate
                 </Link>
               </div>

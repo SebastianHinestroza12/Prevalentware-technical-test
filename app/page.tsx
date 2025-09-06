@@ -1,3 +1,10 @@
-const Home = () => <main className=''>Home</main>;
+import { LogoutButton } from '@/components/Auth/LogoutButton';
 
-export default Home;
+export default function Home() {
+  return (
+    <main>
+      <h1>Welcome to the Home Page</h1>
+      <LogoutButton />
+    </main>
+  );
+}

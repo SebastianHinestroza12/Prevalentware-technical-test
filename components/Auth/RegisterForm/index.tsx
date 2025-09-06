@@ -53,7 +53,7 @@ export const RegisterForm = ({
       if (!result.success) {
         toast.error(result.message);
       } else {
-        toast.success('Usuario registrado exitosamente');
+        toast.success('¡Cuenta creada exitosamente!');
         router.push('/dashboard');
       }
     } catch (error) {
@@ -65,9 +65,11 @@ export const RegisterForm = ({
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader className='text-center'>
-          <CardTitle className='text-xl'>Crear cuenta</CardTitle>
+          <CardTitle className='text-xl font-bold text-emerald-600'>
+            Crea tu cuenta
+          </CardTitle>
           <CardDescription>
-            Regístrate con tu correo electrónico
+            Regístrate y empieza a gestionar tus ingresos y egresos
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -83,7 +85,7 @@ export const RegisterForm = ({
                       Nombre <span className='text-red-500'>*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input placeholder='Tu nombre' {...field} />
+                      <Input placeholder='Tu nombre completo' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -124,10 +126,9 @@ export const RegisterForm = ({
                       />
                     </FormControl>
                     <FormMessage />
-                    <FormDescription>
-                      La contraseña debe tener al menos 8 caracteres, una
-                      mayúscula, una minúscula, un número y un carácter
-                      especial.
+                    <FormDescription className='text-xs text-muted-foreground'>
+                      Debe tener al menos 8 caracteres, una mayúscula, una
+                      minúscula, un número y un carácter especial.
                     </FormDescription>
                   </FormItem>
                 )}
@@ -136,17 +137,22 @@ export const RegisterForm = ({
               {/* Submit */}
               <Button
                 type='submit'
-                className='w-full'
+                className='w-full bg-emerald-600 hover:bg-emerald-700 text-white'
                 disabled={form.formState.isSubmitting}
               >
-                {form.formState.isSubmitting ? 'Cargando...' : 'Registrarse'}
+                {form.formState.isSubmitting
+                  ? 'Creando cuenta...'
+                  : 'Registrarse'}
               </Button>
 
               {/* Login link */}
               <div className='text-center text-sm'>
                 ¿Ya tienes una cuenta?{' '}
-                <Link href='/login' className='underline underline-offset-4'>
-                  Inicia sesión
+                <Link
+                  href='/login'
+                  className='text-emerald-600 hover:underline'
+                >
+                  Inicia sesión aquí
                 </Link>
               </div>
             </form>
