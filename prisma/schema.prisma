@@ -111,7 +111,7 @@ model Verification {
 model Movement {
   id        String   @id @default(cuid())
   concept   String
-  amount    Float
+  amount    Int
   date      DateTime
   userId    String
   type      MovementType

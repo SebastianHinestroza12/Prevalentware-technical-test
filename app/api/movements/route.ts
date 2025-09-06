@@ -1,5 +1,12 @@
 import { prisma } from '@/lib/prisma';
 import { withAuth } from '@/lib/middleware/authMiddleware';
+import {
+  createMovementSchema,
+  updateMovementSchema,
+  deleteMovementSchema,
+} from '@/schemas/movement.schema';
+import { validateSchema } from '@/lib/validateSchema';
+import { ensureMovementExists } from '@/utils/movementUtils';
 
 export const GET = async (req: Request) => {
   const authCheck = await withAuth(req, ['movements:read']);
@@ -15,12 +22,12 @@ export const GET = async (req: Request) => {
 
     const movements = await prisma.movement.findMany({
       where: { userId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { date: 'desc' },
     });
 
     return Response.json({ data: movements });
   } catch (error) {
-    console.error('Error fetching movements:', error);
+    console.error(error);
     return Response.json({ message: 'Internal Server Error' }, { status: 500 });
   }
 };
@@ -30,13 +37,21 @@ export const POST = async (req: Request) => {
   if (!authCheck.authorized) return authCheck.response;
 
   try {
-    const { amount, concept, date, userId, type } = await req.json();
+    const body = await req.json();
+    const validation = validateSchema(createMovementSchema, body);
 
-    if (!amount || !concept || !date || !userId || !type) {
+    if (!validation.success) {
       return Response.json(
-        { message: 'amount, concept, date, userId and type are required' },
+        { message: 'Validation failed', errors: validation.errors },
         { status: 400 }
       );
+    }
+
+    const { amount, concept, date, userId, type } = validation.data;
+
+    const userExists = await prisma.user.findUnique({ where: { id: userId } });
+    if (!userExists) {
+      return Response.json({ message: 'User not found' }, { status: 404 });
     }
 
     const newMovement = await prisma.movement.create({
@@ -45,15 +60,13 @@ export const POST = async (req: Request) => {
         concept,
         date: new Date(date),
         type,
-        user: {
-          connect: { id: userId }
-        }
+        user: { connect: { id: userId } },
       },
     });
 
     return Response.json({ data: newMovement }, { status: 201 });
   } catch (error) {
-    console.error('Error creating movement:', error);
+    console.error(error);
     return Response.json({ message: 'Internal Server Error' }, { status: 500 });
   }
 };
@@ -63,26 +76,29 @@ export const PUT = async (req: Request) => {
   if (!authCheck.authorized) return authCheck.response;
 
   try {
-    const { id, ...data } = await req.json();
+    const body = await req.json();
+    const validation = validateSchema(updateMovementSchema, body);
 
-    if (!id) {
+    if (!validation.success) {
       return Response.json(
-        { message: 'Movement ID is required' },
+        { message: 'Validation failed', errors: validation.errors },
         { status: 400 }
       );
     }
 
+    const { id, ...data } = validation.data;
+
+    const { exists, response } = await ensureMovementExists(id);
+    if (!exists) return response;
+
     const updatedMovement = await prisma.movement.update({
       where: { id },
-      data: {
-        ...data,
-        date: data.date ? new Date(data.date) : undefined,
-      },
+      data: { ...data, date: data.date ? new Date(data.date) : undefined },
     });
 
     return Response.json({ data: updatedMovement });
   } catch (error) {
-    console.error('Error updating movement:', error);
+    console.error(error);
     return Response.json({ message: 'Internal Server Error' }, { status: 500 });
   }
 };
@@ -92,22 +108,24 @@ export const DELETE = async (req: Request) => {
   if (!authCheck.authorized) return authCheck.response;
 
   try {
-    const { id } = await req.json();
+    const body = await req.json();
+    const validation = validateSchema(deleteMovementSchema, body);
 
-    if (!id) {
+    if (!validation.success) {
       return Response.json(
-        { message: 'Movement ID is required' },
+        { message: 'Validation failed', errors: validation.errors },
         { status: 400 }
       );
     }
 
-    await prisma.movement.delete({
-      where: { id },
-    });
+    const { exists, response } = await ensureMovementExists(validation.data.id);
+    if (!exists) return response;
+
+    await prisma.movement.delete({ where: { id: validation.data.id } });
 
     return Response.json(null, { status: 204 });
   } catch (error) {
-    console.error('Error deleting movement:', error);
+    console.error(error);
     return Response.json({ message: 'Internal Server Error' }, { status: 500 });
   }
 };
