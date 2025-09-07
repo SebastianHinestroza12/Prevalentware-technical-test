@@ -1,5 +1,5 @@
 import { API_BASE, API_KEY } from '@/constants';
-import { UserResponse } from '@/interfaces/user';
+import { UserResponse } from '@/interfaces';
 
 export class UsersService {
   static async getUserById(userId: string): Promise<UserResponse> {

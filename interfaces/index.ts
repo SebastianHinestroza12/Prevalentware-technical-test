@@ -4,6 +4,16 @@ export interface Role {
   description: string;
 }
 
+export interface Movement {
+  id: string;
+  concept: string;
+  amount: number;
+  date: string;
+  userId: string;
+  type: 'INCOME' | 'EXPENSE';
+  createdAt: string;
+}
+
 export interface User {
   id: string;
   name: string;
@@ -15,8 +25,13 @@ export interface User {
   updatedAt: string;
   roleId: number;
   role: Role;
+  movements: Movement[];
 }
 
 export interface UserResponse {
   data: User;
+}
+
+export interface MovementResponse {
+  data: Movement;
 }

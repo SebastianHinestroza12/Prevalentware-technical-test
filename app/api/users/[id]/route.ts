@@ -20,7 +20,7 @@ export const GET = async (req: Request, { params }: RouteParams) => {
 
     const user = await prisma.user.findUnique({
       where: { id },
-      include: { role: true },
+      include: { role: true, movements: true },
     });
 
     if (!user) {
