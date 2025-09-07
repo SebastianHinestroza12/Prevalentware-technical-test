@@ -9,7 +9,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import {
   Table,
@@ -25,63 +24,74 @@ import {
   ArrowUpCircle,
   Edit,
   Trash2,
-  DollarSign,
 } from 'lucide-react';
 import { useCreateMovement } from '@/hooks/useCreateMovement';
 import { useUpdateMovement } from '@/hooks/useUpdateMovements';
 import { useDeleteMovement } from '@/hooks/useDeleteMovements';
 import { MovementForm } from '@/components/Form/MovementForm';
 import { ConfirmDeleteDialog } from '@/components/ConfirmDeleteDialog';
-import { type MovementFormData } from '@/schemas/movement.schema';
+import {
+  MovementFormData,
+  UpdateMovementFormData,
+} from '@/schemas/movement.schema';
 import { useUserMovements } from '@/hooks/useUserMovements';
 import { useUserStore } from '@/store/userStore';
 
 export default function TransaccionesPage() {
   const { data: session, isPending } = authClient.useSession();
   const { user } = useUserStore();
-  const { data: movements, isLoading } = useUserMovements(session?.user.id);
+  const {
+    data: movements,
+    isLoading,
+    refetch,
+  } = useUserMovements(session?.user.id);
 
   const createMutation = useCreateMovement();
   const updateMutation = useUpdateMovement();
   const deleteMutation = useDeleteMovement();
 
-  const [openCreate, setOpenCreate] = useState(false);
+  // Control de modales
+  const [openForm, setOpenForm] = useState(false);
   const [editingMovement, setEditingMovement] =
-    useState<MovementFormData | null>(null);
+    useState<UpdateMovementFormData | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const handleCreate = async (values: MovementFormData) => {
+  const isEditing = !!editingMovement;
+
+  // Manejo de creación / edición
+  const handleSubmit = async (values: MovementFormData) => {
     try {
-      await createMutation.mutateAsync({
-        ...values,
-        userId: session?.user?.id || '',
-      });
-      setOpenCreate(false);
+      if (isEditing && editingMovement) {
+        const updateValues: UpdateMovementFormData = {
+          id: editingMovement.id,
+          ...values,
+        };
+        await updateMutation.mutateAsync(updateValues);
+        setEditingMovement(null);
+      } else {
+        await createMutation.mutateAsync({
+          ...values,
+          userId: session?.user?.id || '',
+        });
+      }
+      setOpenForm(false);
+
+      // Refrescar la tabla
+      refetch();
     } catch (error) {
-      console.error('❌ Error creating movement:', error);
+      console.error('❌ Error en movimiento:', error);
     }
   };
 
-  const handleUpdate = async (values: MovementFormData) => {
-    if (!editingMovement) return;
-    try {
-      await updateMutation.mutateAsync({
-        ...values,
-        id: editingMovement.userId,
-      });
-      setEditingMovement(null);
-    } catch (error) {
-      console.error('❌ Error updating movement:', error);
-    }
-  };
-
+  // Eliminación
   const handleDelete = async () => {
     if (!deleteId) return;
     try {
       await deleteMutation.mutateAsync(deleteId);
       setDeleteId(null);
+      refetch();
     } catch (error) {
-      console.error('❌ Error deleting movement:', error);
+      console.error('❌ Error eliminando movimiento:', error);
     }
   };
 
@@ -95,32 +105,15 @@ export default function TransaccionesPage() {
             Ingresos y Egresos
           </CardTitle>
           {user?.role.name === 'ADMIN' && (
-            <Dialog open={openCreate} onOpenChange={setOpenCreate}>
-              <DialogTrigger asChild>
-                <Button className='flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-md cursor-pointer'>
-                  <PlusCircle className='w-4 h-4' /> Nuevo Movimiento
-                </Button>
-              </DialogTrigger>
-              <DialogContent className='sm:max-w-lg'>
-                <DialogHeader>
-                  <DialogTitle className='text-xl font-bold text-gray-800'>
-                    Nuevo Movimiento
-                  </DialogTitle>
-                </DialogHeader>
-                <MovementForm
-                  defaultValues={{
-                    concept: '',
-                    amount: 0,
-                    date: new Date().toISOString().split('T')[0],
-                    type: 'INCOME',
-                    userId: session?.user?.id || '',
-                  }}
-                  onSubmit={handleCreate}
-                  isLoading={createMutation.isPending}
-                  onCancel={() => setOpenCreate(false)}
-                />
-              </DialogContent>
-            </Dialog>
+            <Button
+              className='flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-md cursor-pointer'
+              onClick={() => {
+                setEditingMovement(null);
+                setOpenForm(true);
+              }}
+            >
+              <PlusCircle className='w-4 h-4' /> Nuevo Movimiento
+            </Button>
           )}
         </CardHeader>
 
@@ -157,7 +150,6 @@ export default function TransaccionesPage() {
                       className='text-center py-8 text-gray-500'
                     >
                       <div className='flex flex-col items-center gap-2'>
-                        <DollarSign className='w-12 h-12 text-gray-300' />
                         <p className='text-lg font-medium'>
                           No hay movimientos registrados
                         </p>
@@ -219,7 +211,10 @@ export default function TransaccionesPage() {
                           <Button
                             variant='ghost'
                             size='sm'
-                            onClick={() => setEditingMovement(m)}
+                            onClick={() => {
+                              setEditingMovement(m);
+                              setOpenForm(true);
+                            }}
                             className='h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600 cursor-pointer'
                           >
                             <Edit className='h-4 w-4' />
@@ -243,26 +238,34 @@ export default function TransaccionesPage() {
         </CardContent>
       </Card>
 
-      {editingMovement && (
-        <Dialog
-          open={!!editingMovement}
-          onOpenChange={() => setEditingMovement(null)}
-        >
-          <DialogContent>
+      {/* Modal de Crear / Editar */}
+      {openForm && (
+        <Dialog open={openForm} onOpenChange={() => setOpenForm(false)}>
+          <DialogContent className='sm:max-w-lg'>
             <DialogHeader>
-              <DialogTitle>Editar Movimiento</DialogTitle>
+              <DialogTitle className='text-xl font-bold text-gray-800'>
+                {isEditing ? 'Editar Movimiento' : 'Nuevo Movimiento'}
+              </DialogTitle>
             </DialogHeader>
             <MovementForm
-              defaultValues={editingMovement}
-              onSubmit={handleUpdate}
-              isLoading={updateMutation.isPending}
-              onCancel={() => setEditingMovement(null)}
+              defaultValues={editingMovement || undefined}
+              onSubmit={handleSubmit}
+              isLoading={
+                isEditing ? updateMutation.isPending : createMutation.isPending
+              }
+              onCancel={() => setOpenForm(false)}
             />
           </DialogContent>
         </Dialog>
       )}
 
-      {deleteId && <ConfirmDeleteDialog onConfirm={handleDelete} />}
+      {/* Confirmación de Eliminación */}
+      {deleteId && (
+        <ConfirmDeleteDialog
+          onConfirm={handleDelete}
+          onCancel={() => setDeleteId(null)}
+        />
+      )}
     </div>
   );
 }

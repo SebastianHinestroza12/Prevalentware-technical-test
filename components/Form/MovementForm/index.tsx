@@ -15,12 +15,14 @@ import {
 } from '@/components/ui/select';
 import {
   createMovementSchema,
-  type MovementFormData,
+  MovementFormData,
+  UpdateMovementFormData,
 } from '@/schemas/movement.schema';
 import { authClient } from '@/lib/auth/client';
+import { Loader2 } from 'lucide-react';
 
 interface MovementFormProps {
-  defaultValues?: MovementFormData;
+  defaultValues?: UpdateMovementFormData;
   onSubmit: (values: MovementFormData) => void;
   isLoading?: boolean;
   onCancel?: () => void;
@@ -33,35 +35,37 @@ export const MovementForm = ({
   onCancel,
 }: MovementFormProps) => {
   const { data: session } = authClient.useSession();
-  
+
   const form = useForm<MovementFormData>({
     resolver: zodResolver(createMovementSchema),
     defaultValues: defaultValues || {
       concept: '',
-      amount: 0,
+      amount: 10000,
       date: new Date().toISOString().split('T')[0],
       type: 'INCOME',
-      userId: '',
+      userId: session?.user?.id || '',
     },
     mode: 'onChange',
   });
 
   useEffect(() => {
-    if (defaultValues) {
-      form.reset(defaultValues);
-    }
+    if (defaultValues) form.reset(defaultValues);
   }, [defaultValues, form]);
 
   useEffect(() => {
-    if (session?.user?.id) {
-      form.setValue('userId', session.user.id);
-    }
+    if (session?.user?.id) form.setValue('userId', session.user.id);
   }, [session?.user?.id, form]);
+
+  const renderLabel = (text: string) => (
+    <Label>
+      {text} <span className='text-red-500'>*</span>
+    </Label>
+  );
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className='grid gap-4 py-4'>
       <div className='grid gap-2'>
-        <Label>Concepto</Label>
+        {renderLabel('Concepto')}
         <Input {...form.register('concept')} />
         {form.formState.errors.concept && (
           <span className='text-red-500 text-sm'>
@@ -71,7 +75,7 @@ export const MovementForm = ({
       </div>
 
       <div className='grid gap-2'>
-        <Label>Monto</Label>
+        {renderLabel('Monto')}
         <Input
           type='number'
           step='0.01'
@@ -85,7 +89,7 @@ export const MovementForm = ({
       </div>
 
       <div className='grid gap-2'>
-        <Label>Fecha</Label>
+        {renderLabel('Fecha')}
         <Input type='date' {...form.register('date')} />
         {form.formState.errors.date && (
           <span className='text-red-500 text-sm'>
@@ -95,7 +99,7 @@ export const MovementForm = ({
       </div>
 
       <div className='grid gap-2'>
-        <Label>Tipo</Label>
+        {renderLabel('Tipo')}
         <Select
           value={form.watch('type')}
           onValueChange={(val) =>
@@ -119,11 +123,17 @@ export const MovementForm = ({
             variant='outline'
             onClick={onCancel}
             className='flex-1'
+            disabled={isLoading}
           >
             Cancelar
           </Button>
         )}
-        <Button type='submit' className='flex-1' disabled={isLoading}>
+        <Button
+          type='submit'
+          className='flex-1 flex justify-center items-center gap-2'
+          disabled={isLoading}
+        >
+          {isLoading && <Loader2 className='w-4 h-4 animate-spin' />}
           {isLoading ? 'Guardando...' : 'Guardar'}
         </Button>
       </div>

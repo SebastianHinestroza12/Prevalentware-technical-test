@@ -25,6 +25,8 @@ export const updateMovementSchema = z.object({
   type: z.enum(['INCOME', 'EXPENSE']).optional(),
 });
 
+export type UpdateMovementFormData = z.infer<typeof updateMovementSchema>;
+
 export const deleteMovementSchema = z.object({
   id: z.string().min(10),
 });
