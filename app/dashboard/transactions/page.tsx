@@ -29,6 +29,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { PlusCircle, ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
+import { useUser } from '@/hooks/useUser';
 
 interface Movement {
   id: string;
@@ -41,6 +42,7 @@ interface Movement {
 
 export default function TransaccionesPage() {
   const { data: session, isPending } = authClient.useSession();
+  const { data: user, isLoading: userLoading } = useUser(session?.user?.id);
   const [movements, setMovements] = useState<Movement[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -92,7 +94,7 @@ export default function TransaccionesPage() {
     }
   };
 
-  if (isPending) return <p className='p-6'>Cargando sesión...</p>;
+  if (isPending || userLoading) return <p>Cargando...</p>;
 
   return (
     <div className='p-6 space-y-6'>
@@ -101,7 +103,7 @@ export default function TransaccionesPage() {
           <CardTitle className='text-2xl font-bold'>
             Ingresos y Egresos
           </CardTitle>
-          {session?.user.name === 'ADMIN' && (
+          {user?.role.name === 'ADMIN' && (
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
                 <Button className='flex items-center gap-2'>
