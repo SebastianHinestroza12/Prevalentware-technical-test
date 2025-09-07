@@ -49,23 +49,28 @@ export const POST = async (req: Request) => {
 
     const { amount, concept, date, userId, type } = validation.data;
 
-    const userExists = await prisma.user.findUnique({ where: { id: userId } });
-    if (!userExists) {
-      return Response.json({ message: 'User not found' }, { status: 404 });
-    }
+    const newMovement = await prisma.$transaction(async (tx) => {
+      const user = await tx.user.findUnique({ where: { id: userId } });
+      if (!user) {
+        throw new Error('UserNotFound');
+      }
 
-    const newMovement = await prisma.movement.create({
-      data: {
-        amount,
-        concept,
-        date: new Date(date),
-        type,
-        user: { connect: { id: userId } },
-      },
+      return await tx.movement.create({
+        data: {
+          amount,
+          concept,
+          date: new Date(date),
+          type,
+          user: { connect: { id: userId } },
+        },
+      });
     });
 
     return Response.json({ data: newMovement }, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
+    if (error.message === 'UserNotFound') {
+      return Response.json({ message: 'User not found' }, { status: 404 });
+    }
     console.error(error);
     return Response.json({ message: 'Internal Server Error' }, { status: 500 });
   }
@@ -91,9 +96,11 @@ export const PUT = async (req: Request) => {
     const { exists, response } = await ensureMovementExists(id);
     if (!exists) return response;
 
-    const updatedMovement = await prisma.movement.update({
-      where: { id },
-      data: { ...data, date: data.date ? new Date(data.date) : undefined },
+    const updatedMovement = await prisma.$transaction(async (tx) => {
+      return await tx.movement.update({
+        where: { id },
+        data: { ...data, date: data.date ? new Date(data.date) : undefined },
+      });
     });
 
     return Response.json({ data: updatedMovement });
@@ -121,9 +128,11 @@ export const DELETE = async (req: Request) => {
     const { exists, response } = await ensureMovementExists(validation.data.id);
     if (!exists) return response;
 
-    await prisma.movement.delete({ where: { id: validation.data.id } });
+    await prisma.$transaction(async (tx) => {
+      await tx.movement.delete({ where: { id: validation.data.id } });
+    });
 
-    return Response.json(null, { status: 204 });
+    return new Response(null, { status: 204 });
   } catch (error) {
     console.error(error);
     return Response.json({ message: 'Internal Server Error' }, { status: 500 });
