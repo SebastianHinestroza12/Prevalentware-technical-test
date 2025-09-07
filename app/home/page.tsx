@@ -14,24 +14,22 @@ export default function Home() {
 
   // Obtener la sesión solo si no hay user en el store
   useEffect(() => {
-    if (!user) {
-      const load = async () => {
-        const session = await authClient.getSession();
-        if (session?.data?.user?.id) {
-          setUserId(session.data.user.id);
-        }
-      };
-      load();
-    }
-  }, [user]);
+    const load = async () => {
+      const session = await authClient.getSession();
+      if (session?.data?.user?.id) {
+        setUserId(session.data.user.id);
+      }
+    };
+    load();
+  }, []);
 
-  const query = useUser(user ? undefined : userId);
+  const query = useUser(userId);
 
   useEffect(() => {
-    if (query.data && !user) {
+    if (query.data) {
       setUser(query.data);
     }
-  }, [query.data, user, setUser]);
+  }, [query.data, setUser]);
 
   return (
     <DashboardLayout>

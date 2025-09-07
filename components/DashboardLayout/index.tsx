@@ -17,6 +17,7 @@ import { LogoutButton } from '@/components/Auth/LogoutButton';
 import { authClient } from '@/lib/auth/client';
 import { MENU_ITEMS } from '@/constants';
 import { useUserStore } from '@/store/userStore';
+import { getRoleLabel } from '@/utils/roles';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user } = useUserStore();
@@ -79,6 +80,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                   <p className='text-sm text-gray-500'>¡Hola 👋!</p>
                   <p className='text-base font-semibold text-gray-800'>
                     {session.user.name}
+                  </p>
+                  <p className='text-xs text-gray-400'>
+                    {getRoleLabel(user?.role.name)}
                   </p>
                 </div>
                 {session.user.image && (

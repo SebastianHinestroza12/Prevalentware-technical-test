@@ -61,7 +61,12 @@ async function main() {
 
   // Asignar solo `movements:read` a USER
   const userPermissions = allPermissions.filter((p) =>
-    ['movements:read'].includes(p.name)
+    [
+      'movements:read',
+      'users:read',
+      'movements:update',
+      'movements:delete',
+    ].includes(p.name)
   );
 
   for (const p of userPermissions) {
