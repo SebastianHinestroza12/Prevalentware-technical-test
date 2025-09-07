@@ -36,8 +36,10 @@ export default function Home() {
   return (
     <DashboardLayout>
       <div className='max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-        {CARDS.map((card, index) => (
-          <DashboardCard key={index} {...card} />
+        {CARDS.filter((card) =>
+          card.roles.includes((user?.role.name as 'USER' | 'ADMIN') ?? '')
+        ).map((card) => (
+          <DashboardCard key={card.href} {...card} />
         ))}
       </div>
     </DashboardLayout>

@@ -29,6 +29,8 @@ export const DashboardCard = ({
 }: DashboardCardProps) => {
   const colorClasses = getColorClasses(color);
 
+  console.log(colorClasses);
+
   return (
     <Card
       className={`group hover:shadow-lg transition-all duration-300 border-2 ${colorClasses.borderColor} cursor-pointer flex flex-col`}
@@ -43,7 +45,7 @@ export const DashboardCard = ({
             </div>
           </div>
           <CardTitle
-            className={`text-xl font-bold text-gray-900 ${colorClasses.textColor} transition-colors`}
+            className={`text-xl font-bold ${colorClasses.textColor} transition-colors`}
           >
             {title}
           </CardTitle>
