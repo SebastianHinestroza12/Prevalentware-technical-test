@@ -19,7 +19,7 @@ export const GET = async (req: Request) => {
       m.id,
       m.concept,
       m.amount.toString(),
-      m.date.toISOString(),
+      m.date.toISOString().split('T')[0],
       m.type,
       m.user?.email || '',
     ]);
