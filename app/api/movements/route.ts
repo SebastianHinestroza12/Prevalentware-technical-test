@@ -60,7 +60,7 @@ export const POST = async (req: Request) => {
           amount,
           concept,
           date: new Date(date),
-          type,
+          type: type as 'INCOME' | 'EXPENSE',
           user: { connect: { id: userId } },
         },
       });

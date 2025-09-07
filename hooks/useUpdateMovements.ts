@@ -6,26 +6,24 @@ import { MovementsService } from '@/services/movements.service';
 import { MovementResponse } from '@/interfaces';
 import { MovementFormData } from '@/schemas/movement.schema';
 
-export const useCreateMovement = () => {
+export const useUpdateMovement = () => {
   const queryClient = useQueryClient();
 
   return useMutation<
     MovementResponse,
     Error,
-    MovementFormData
+    Partial<MovementFormData> & { id: string }
   >({
-    mutationFn: (data) => MovementsService.createMovement(data),
+    mutationFn: (data) => MovementsService.updateMovement(data),
     onSuccess: () => {
-      // refrescar cache de usuario
       queryClient.invalidateQueries({
         queryKey: ['user', 'movements'],
         exact: false,
       });
-
-      toast.success('Movimiento creado con éxito');
+      toast.success('Movimiento actualizado con éxito');
     },
     onError: (error) => {
-      toast.error(error.message || 'Error al crear movimiento');
+      toast.error(error.message || 'Error al actualizar movimiento');
     },
   });
-}
+};

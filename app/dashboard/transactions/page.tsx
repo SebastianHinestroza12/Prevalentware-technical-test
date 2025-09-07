@@ -44,10 +44,11 @@ import {
   createMovementSchema,
   type MovementFormData,
 } from '@/schemas/movement.schema';
+import { useUserStore } from '@/store/userStore';
 
 export default function TransaccionesPage() {
   const { data: session, isPending } = authClient.useSession();
-  const { data: user, isLoading: userLoading } = useUser(session?.user?.id);
+  const { user } = useUserStore();
   const [open, setOpen] = useState(false);
 
   const createMutation = useCreateMovement();
@@ -96,7 +97,7 @@ export default function TransaccionesPage() {
     // TODO: Implement delete functionality
   };
 
-  if (isPending || userLoading) return <p>Cargando...</p>;
+  if (isPending) return <p>Cargando...</p>;
 
   return (
     <div className='p-6 space-y-6 bg-gray-50 min-h-screen'>
