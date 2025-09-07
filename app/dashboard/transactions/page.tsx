@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { authClient } from '@/lib/auth/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,15 +11,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -36,68 +27,65 @@ import {
   Trash2,
   DollarSign,
 } from 'lucide-react';
-import { useUser } from '@/hooks/useUser';
 import { useCreateMovement } from '@/hooks/useCreateMovement';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  createMovementSchema,
-  type MovementFormData,
-} from '@/schemas/movement.schema';
+import { useUpdateMovement } from '@/hooks/useUpdateMovements';
+import { useDeleteMovement } from '@/hooks/useDeleteMovements';
+import { MovementForm } from '@/components/Form/MovementForm';
+import { ConfirmDeleteDialog } from '@/components/ConfirmDeleteDialog';
+import { type MovementFormData } from '@/schemas/movement.schema';
+import { useUserMovements } from '@/hooks/useUserMovements';
 import { useUserStore } from '@/store/userStore';
 
 export default function TransaccionesPage() {
   const { data: session, isPending } = authClient.useSession();
   const { user } = useUserStore();
-  const [open, setOpen] = useState(false);
+  const { data: movements, isLoading } = useUserMovements(session?.user.id);
 
   const createMutation = useCreateMovement();
+  const updateMutation = useUpdateMovement();
+  const deleteMutation = useDeleteMovement();
 
-  const form = useForm<MovementFormData>({
-    resolver: zodResolver(createMovementSchema),
-    defaultValues: {
-      concept: '',
-      amount: 0,
-      date: new Date().toISOString().split('T')[0],
-      type: 'INCOME',
-    },
-    mode: 'onChange',
-  });
+  const [openCreate, setOpenCreate] = useState(false);
+  const [editingMovement, setEditingMovement] =
+    useState<MovementFormData | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (session?.user?.id) {
-      form.setValue('userId', session.user.id);
-    }
-  }, [session?.user?.id, form]);
-
-  const onSubmit = async (values: MovementFormData) => {
+  const handleCreate = async (values: MovementFormData) => {
     try {
-      await createMutation.mutateAsync(values);
-
-      setOpen(false);
-      form.reset({
-        concept: '',
-        amount: 0,
-        date: new Date().toISOString().split('T')[0],
-        type: 'INCOME',
+      await createMutation.mutateAsync({
+        ...values,
         userId: session?.user?.id || '',
       });
+      setOpenCreate(false);
     } catch (error) {
       console.error('❌ Error creating movement:', error);
     }
   };
 
-  const handleEdit = (movementId: string) => {
-    console.log(movementId);
-    // TODO: Implement edit functionality
+  const handleUpdate = async (values: MovementFormData) => {
+    if (!editingMovement) return;
+    try {
+      await updateMutation.mutateAsync({
+        ...values,
+        id: editingMovement.userId,
+      });
+      setEditingMovement(null);
+    } catch (error) {
+      console.error('❌ Error updating movement:', error);
+    }
   };
 
-  const handleDelete = (movementId: string) => {
-    console.log('[v0] Delete movement:', movementId);
-    // TODO: Implement delete functionality
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    try {
+      await deleteMutation.mutateAsync(deleteId);
+      setDeleteId(null);
+    } catch (error) {
+      console.error('❌ Error deleting movement:', error);
+    }
   };
 
-  if (isPending) return <p>Cargando...</p>;
+  if (isPending || isLoading) return <p>Cargando...</p>;
 
   return (
     <div className='p-6 space-y-6 bg-gray-50 min-h-screen'>
@@ -107,7 +95,7 @@ export default function TransaccionesPage() {
             Ingresos y Egresos
           </CardTitle>
           {user?.role.name === 'ADMIN' && (
-            <Dialog open={open} onOpenChange={setOpen}>
+            <Dialog open={openCreate} onOpenChange={setOpenCreate}>
               <DialogTrigger asChild>
                 <Button className='flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-md cursor-pointer'>
                   <PlusCircle className='w-4 h-4' /> Nuevo Movimiento
@@ -119,94 +107,18 @@ export default function TransaccionesPage() {
                     Nuevo Movimiento
                   </DialogTitle>
                 </DialogHeader>
-
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className='grid gap-4 py-4'
-                >
-                  <div className='grid gap-2'>
-                    <Label className='font-semibold text-gray-700'>
-                      Concepto
-                    </Label>
-                    <Input
-                      {...form.register('concept')}
-                      placeholder='Ej: Venta de producto, Pago de servicios...'
-                      className='border-gray-300 focus:border-emerald-500'
-                    />
-                    {form.formState.errors.concept && (
-                      <span className='text-red-500 text-sm'>
-                        {form.formState.errors.concept.message}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className='grid gap-2'>
-                    <Label className='font-semibold text-gray-700'>Monto</Label>
-                    <Input
-                      type='number'
-                      step='0.01'
-                      min='0'
-                      placeholder='0.00'
-                      className='border-gray-300 focus:border-emerald-500'
-                      {...form.register('amount', { valueAsNumber: true })}
-                    />
-                    {form.formState.errors.amount && (
-                      <span className='text-red-500 text-sm'>
-                        {form.formState.errors.amount.message}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className='grid gap-2'>
-                    <Label className='font-semibold text-gray-700'>Fecha</Label>
-                    <Input
-                      type='date'
-                      className='border-gray-300 focus:border-emerald-500'
-                      {...form.register('date')}
-                    />
-                    {form.formState.errors.date && (
-                      <span className='text-red-500 text-sm'>
-                        {form.formState.errors.date.message}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className='grid gap-2'>
-                    <Label className='font-semibold text-gray-700'>Tipo</Label>
-                    <Select
-                      value={form.watch('type')}
-                      onValueChange={(val) =>
-                        form.setValue('type', val as 'INCOME' | 'EXPENSE')
-                      }
-                    >
-                      <SelectTrigger className='border-gray-300 focus:border-emerald-500'>
-                        <SelectValue placeholder='Selecciona el tipo' />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value='INCOME'>💰 Ingreso</SelectItem>
-                        <SelectItem value='EXPENSE'>💸 Egreso</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className='flex gap-2 pt-4'>
-                    <Button
-                      type='button'
-                      variant='outline'
-                      onClick={() => setOpen(false)}
-                      className='flex-1 cursor-pointer'
-                    >
-                      Cancelar
-                    </Button>
-                    <Button
-                      type='submit'
-                      disabled={createMutation.isPending}
-                      className='flex-1 bg-emerald-600 hover:bg-emerald-700 cursor-pointer'
-                    >
-                      {createMutation.isPending ? 'Guardando...' : 'Guardar'}
-                    </Button>
-                  </div>
-                </form>
+                <MovementForm
+                  defaultValues={{
+                    concept: '',
+                    amount: 0,
+                    date: new Date().toISOString().split('T')[0],
+                    type: 'INCOME',
+                    userId: session?.user?.id || '',
+                  }}
+                  onSubmit={handleCreate}
+                  isLoading={createMutation.isPending}
+                  onCancel={() => setOpenCreate(false)}
+                />
               </DialogContent>
             </Dialog>
           )}
@@ -238,7 +150,7 @@ export default function TransaccionesPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {(user?.movements || []).length === 0 ? (
+                {(movements || []).length === 0 ? (
                   <TableRow>
                     <TableCell
                       colSpan={6}
@@ -256,17 +168,23 @@ export default function TransaccionesPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  (user?.movements || []).map((m, index) => (
+                  (movements || []).map((m, index) => (
                     <TableRow
                       key={m.id}
-                      className={`hover:bg-gray-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'}`}
+                      className={`hover:bg-gray-50 transition-colors ${
+                        index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                      }`}
                     >
                       <TableCell className='font-medium text-gray-900 py-4'>
                         {m.concept}
                       </TableCell>
                       <TableCell className='py-4'>
                         <span
-                          className={`font-bold text-lg ${m.type === 'EXPENSE' ? 'text-red-600' : 'text-emerald-600'}`}
+                          className={`font-bold text-lg ${
+                            m.type === 'EXPENSE'
+                              ? 'text-red-600'
+                              : 'text-emerald-600'
+                          }`}
                         >
                           {m.type === 'EXPENSE' ? '-' : '+'}
                           {m.amount.toLocaleString('es-CO', {
@@ -301,7 +219,7 @@ export default function TransaccionesPage() {
                           <Button
                             variant='ghost'
                             size='sm'
-                            onClick={() => handleEdit(m.id)}
+                            onClick={() => setEditingMovement(m)}
                             className='h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600 cursor-pointer'
                           >
                             <Edit className='h-4 w-4' />
@@ -309,7 +227,7 @@ export default function TransaccionesPage() {
                           <Button
                             variant='ghost'
                             size='sm'
-                            onClick={() => handleDelete(m.id)}
+                            onClick={() => setDeleteId(m.id)}
                             className='h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600 cursor-pointer'
                           >
                             <Trash2 className='h-4 w-4' />
@@ -324,6 +242,27 @@ export default function TransaccionesPage() {
           </div>
         </CardContent>
       </Card>
+
+      {editingMovement && (
+        <Dialog
+          open={!!editingMovement}
+          onOpenChange={() => setEditingMovement(null)}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Editar Movimiento</DialogTitle>
+            </DialogHeader>
+            <MovementForm
+              defaultValues={editingMovement}
+              onSubmit={handleUpdate}
+              isLoading={updateMutation.isPending}
+              onCancel={() => setEditingMovement(null)}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {deleteId && <ConfirmDeleteDialog onConfirm={handleDelete} />}
     </div>
   );
 }

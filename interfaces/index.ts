@@ -10,6 +10,7 @@ export interface Movement {
   amount: number;
   date: string;
   userId: string;
+  user: User;
   type: 'INCOME' | 'EXPENSE';
   createdAt: string;
 }

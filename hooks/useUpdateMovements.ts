@@ -17,7 +17,7 @@ export const useUpdateMovement = () => {
     mutationFn: (data) => MovementsService.updateMovement(data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['user', 'movements'],
+        queryKey: ['userMovements'],
         exact: false,
       });
       toast.success('Movimiento actualizado con éxito');

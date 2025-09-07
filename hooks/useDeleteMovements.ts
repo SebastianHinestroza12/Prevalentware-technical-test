@@ -11,7 +11,7 @@ export const useDeleteMovement = () => {
     mutationFn: (id) => MovementsService.deleteMovement(id),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['user', 'movements'],
+        queryKey: ['userMovements'],
         exact: false,
       });
       toast.success('Movimiento eliminado con éxito');

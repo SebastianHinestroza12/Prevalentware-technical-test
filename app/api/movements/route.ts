@@ -22,6 +22,13 @@ export const GET = async (req: Request) => {
 
     const movements = await prisma.movement.findMany({
       where: { userId },
+      include: {
+        user: {
+          include: {
+            role: true,
+          },
+        },
+      },
       orderBy: { date: 'desc' },
     });
 

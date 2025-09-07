@@ -1,8 +1,21 @@
 import { API_BASE, API_KEY } from '@/constants';
-import { MovementResponse } from '@/interfaces';
+import { Movement, MovementResponse } from '@/interfaces';
 import { MovementFormData } from '@/schemas/movement.schema';
 
 export class MovementsService {
+  static async getUserMovements(userId: string): Promise<Movement[]> {
+    const res = await fetch(`${API_BASE}/movements?userId=${userId}`, {
+      method: 'GET',
+      headers: {
+        'x-api-key': API_KEY,
+      },
+    });
+
+    if (!res.ok) throw new Error('Error fetching user movements');
+    const data = await res.json();
+    return data.data;
+  }
+
   static async createMovement(
     data: MovementFormData
   ): Promise<MovementResponse> {

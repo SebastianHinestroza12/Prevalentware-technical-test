@@ -18,7 +18,7 @@ export const useCreateMovement = () => {
     onSuccess: () => {
       // refrescar cache de usuario
       queryClient.invalidateQueries({
-        queryKey: ['user', 'movements'],
+        queryKey: ['userMovements'],
         exact: false,
       });
 
