@@ -10,13 +10,16 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
-import { DollarSign, Users, BarChart3, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import Link from 'next/link';
 import { Logo } from '@/components/Logo';
 import { LogoutButton } from '@/components/Auth/LogoutButton';
 import { authClient } from '@/lib/auth/client';
+import { MENU_ITEMS } from '@/constants';
+import { useUserStore } from '@/store/userStore';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const { user } = useUserStore();
   const { data: session } = authClient.useSession();
 
   return (
@@ -31,48 +34,24 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
             <SidebarContent className='p-4 flex-1'>
               <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    className='w-full justify-start p-3 mb-2 hover:bg-emerald-50 hover:text-emerald-700 transition-colors'
-                  >
-                    <Link
-                      href='/dashboard/transactions'
-                      className='flex items-center gap-3'
+                {MENU_ITEMS.filter((item) =>
+                  item.roles.includes(user?.role.name ?? '')
+                ).map((item) => (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      asChild
+                      className='w-full justify-start p-3 mb-2 hover:bg-emerald-50 hover:text-emerald-700 transition-colors'
                     >
-                      <DollarSign className='h-5 w-5' />
-                      <span className='font-medium'>Ingresos y egresos</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    className='w-full justify-start p-3 mb-2 hover:bg-emerald-50 hover:text-emerald-700 transition-colors'
-                  >
-                    <Link
-                      href='/dashboard/users'
-                      className='flex items-center gap-3'
-                    >
-                      <Users className='h-5 w-5' />
-                      <span className='font-medium'>Usuarios</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    className='w-full justify-start p-3 mb-2 hover:bg-emerald-50 hover:text-emerald-700 transition-colors'
-                  >
-                    <Link
-                      href='/dashboard/reports'
-                      className='flex items-center gap-3'
-                    >
-                      <BarChart3 className='h-5 w-5' />
-                      <span className='font-medium'>Reportes</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                      <Link
+                        href={item.href}
+                        className='flex items-center gap-3'
+                      >
+                        <item.icon className='h-5 w-5' />
+                        <span className='font-medium'>{item.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
               </SidebarMenu>
             </SidebarContent>
 

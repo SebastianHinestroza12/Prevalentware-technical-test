@@ -8,6 +8,7 @@ export interface DashboardCardData {
   href: string;
   icon: React.ReactNode;
   color: ColorVariant;
+  roles: ('USER' | 'ADMIN')[];
 }
 
 export const CARDS: DashboardCardData[] = [
@@ -18,6 +19,7 @@ export const CARDS: DashboardCardData[] = [
     href: '/dashboard/transactions',
     icon: createElement(DollarSign, { className: 'h-8 w-8 text-emerald-600' }),
     color: 'emerald',
+    roles: ['USER', 'ADMIN'],
   },
   {
     title: 'Gestión de usuarios',
@@ -26,6 +28,7 @@ export const CARDS: DashboardCardData[] = [
     href: '/dashboard/users',
     icon: createElement(Users, { className: 'h-8 w-8 text-orange-600' }),
     color: 'orange',
+    roles: ['ADMIN'],
   },
   {
     title: 'Reportes',
@@ -34,6 +37,28 @@ export const CARDS: DashboardCardData[] = [
     href: '/dashboard/reports',
     icon: createElement(BarChart3, { className: 'h-8 w-8 text-emerald-600' }),
     color: 'emerald',
+    roles: ['ADMIN'],
+  },
+];
+
+export const MENU_ITEMS = [
+  {
+    label: 'Ingresos y egresos',
+    href: '/dashboard/transactions',
+    icon: DollarSign,
+    roles: ['USER', 'ADMIN'],
+  },
+  {
+    label: 'Usuarios',
+    href: '/dashboard/users',
+    icon: Users,
+    roles: ['ADMIN'],
+  },
+  {
+    label: 'Reportes',
+    href: '/dashboard/reports',
+    icon: BarChart3,
+    roles: ['ADMIN'],
   },
 ];
 
