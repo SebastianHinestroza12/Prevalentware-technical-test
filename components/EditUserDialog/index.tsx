@@ -20,6 +20,9 @@ import {
 } from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
 import { useUpdateUser } from '@/hooks/useUsers';
+import { authClient } from '@/lib/auth/client';
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 interface EditUserDialogProps {
   open: boolean;
@@ -38,9 +41,11 @@ export const EditUserDialog = ({
   open,
   onClose,
   user,
-  refetch
+  refetch,
 }: EditUserDialogProps) => {
   const { mutateAsync, isPending } = useUpdateUser();
+  const { data: session } = authClient.useSession();
+  const router = useRouter();
 
   const form = useForm<EditUserFormData>({
     resolver: zodResolver(editUserSchema),
@@ -52,9 +57,28 @@ export const EditUserDialog = ({
   });
 
   const onSubmit = async (data: EditUserFormData) => {
-    await mutateAsync({ id: user.id, body: data });
-    refetch();
-    onClose();
+    try {
+      // Verificar si el usuario está editando su propio perfil
+      const isEditingOwnProfile = session?.user?.id === user.id;
+
+      // Verificar si se está cambiando el rol
+      const isChangingRole = data.roleId !== user?.role?.id.toString();
+
+      // Actualizar el usuario
+      await mutateAsync({ id: user.id, body: data });
+      refetch();
+      onClose();
+
+      // Si el usuario está editando su propio perfil y cambió su rol
+      if (isEditingOwnProfile && isChangingRole) {
+        // Cerrar la sesión
+        await authClient.signOut();
+        router.push('/login');
+      }
+    } catch (error) {
+      console.error('❌ Error actualizando usuario:', error);
+      toast.error('Error al actualizar el usuario');
+    }
   };
 
   return (
@@ -100,9 +124,27 @@ export const EditUserDialog = ({
             )}
           </div>
 
+          {/* Advertencia si está editando su propio rol */}
+          {session?.user?.id === user.id && (
+            <div className='bg-amber-50 border border-amber-200 rounded-md p-3'>
+              <div className='flex items-center'>
+                <div className='text-amber-600 text-sm'>
+                  ⚠️ <strong>Advertencia:</strong> Si cambias tu propio rol, tu
+                  sesión se cerrará automáticamente y deberás iniciar sesión
+                  nuevamente.
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Botones */}
           <div className='flex justify-end gap-2'>
-            <Button variant='outline' onClick={onClose} type='button'>
+            <Button
+              variant='outline'
+              onClick={onClose}
+              type='button'
+              disabled={isPending}
+            >
               Cancelar
             </Button>
             <Button type='submit' disabled={isPending}>
