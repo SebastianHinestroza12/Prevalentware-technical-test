@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { DashboardCard } from '@/components/DashboardCard';
-import { CARDS } from '@/constants';
+import { API_KEY, CARDS } from '@/constants';
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { authClient } from '@/lib/auth/client';
 import { useUser } from '@/hooks/useUser';
@@ -12,17 +12,35 @@ export default function Home() {
   const { user, setUser } = useUserStore();
   const [userId, setUserId] = useState<string>();
 
-  // Obtener la sesión solo si no hay user en el store
+  //  Cargar la sesión
   useEffect(() => {
-    const load = async () => {
+    const loadSession = async () => {
       const session = await authClient.getSession();
+
       if (session?.data?.user?.id) {
-        setUserId(session.data.user.id);
+        const id = session.data.user.id;
+
+        // Asegurar rol
+        try {
+          await fetch(`/api/roles/${id}/assign`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': API_KEY,
+            },
+          });
+        } catch (err) {
+          console.error('Error assigning role:', err);
+        }
+
+        // Guardar userId para query
+        setUserId(id);
       }
     };
-    load();
+    loadSession();
   }, []);
 
+  // Query para traer al usuario actualizado (con rol ya aplicado)
   const query = useUser(userId);
 
   useEffect(() => {
