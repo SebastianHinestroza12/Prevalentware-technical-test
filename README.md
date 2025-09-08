@@ -7,7 +7,7 @@
 ## 📸 Screenshots
 
 ### Landing Page
-![Landing Page](https://res.cloudinary.com/dafsjo7al/image/upload/v1757337850/Macbook-Air-prevalentware-technical-test.vercel.app_1_wcubvs.png)
+![Landing Page](https://res.cloudinary.com/dafsjo7al/image/upload/v1757344358/Macbook-Air-localhost_l13rse.png)
 
 ### Registro / Inicio de sesión
 ![Registro](https://res.cloudinary.com/dafsjo7al/image/upload/v1757337850/iPhone-13-PRO-prevalentware-technical-test.vercel.app_1_jtq9ou.png)  
