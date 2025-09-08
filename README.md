@@ -7,23 +7,23 @@
 ## 📸 Screenshots
 
 ### Landing Page
-![Landing Page](https://asset.cloudinary.com/dafsjo7al/476dc9a6bf452055c6c1582be669aa69)
+![Landing Page](https://res.cloudinary.com/dafsjo7al/image/upload/v1757337850/Macbook-Air-prevalentware-technical-test.vercel.app_1_wcubvs.png)
 
 ### Registro / Inicio de sesión
-![Registro](https://asset.cloudinary.com/dafsjo7al/d511d0fe19158b48e1ebec094c366731)  
-![Login](https://asset.cloudinary.com/dafsjo7al/12c62f6ccd43c1b2a20b4ed4b6e5d13a)
+![Registro](https://res.cloudinary.com/dafsjo7al/image/upload/v1757337850/iPhone-13-PRO-prevalentware-technical-test.vercel.app_1_jtq9ou.png)  
+![Login](https://res.cloudinary.com/dafsjo7al/image/upload/v1757337850/iPhone-13-PRO-prevalentware-technical-test.vercel.app_cchjwd.png)
 
 ### Página de Inicio
-![Dashboard](https://asset.cloudinary.com/dafsjo7al/f48ee5adf62f36763bf871badd7f94cc)
+![Dashboard](https://res.cloudinary.com/dafsjo7al/image/upload/v1757337850/Macbook-Air-prevalentware-technical-test.vercel.app_2_xygy3m.png)
 
 ### Módulo de Usuario
-![Usuarios](https://asset.cloudinary.com/dafsjo7al/e4f4bf8b2961d201e604eda7c4de7ca3)
+![Usuarios](https://res.cloudinary.com/dafsjo7al/image/upload/v1757337850/Macbook-Air-prevalentware-technical-test.vercel.app_4_zgsq45.png)
 
 ### Ingresos y Egresos
-![Ingresos Y Egresos](https://asset.cloudinary.com/dafsjo7al/e4f4bf8b2961d201e604eda7c4de7ca3)
+![Ingresos Y Egresos](https://res.cloudinary.com/dafsjo7al/image/upload/v1757337849/Macbook-Air-prevalentware-technical-test.vercel.app_3_tbixuu.png)
 
 ### Reportes
-![Reportes](https://asset.cloudinary.com/dafsjo7al/8b604263b7783b8a11dd85dd3d656ac8)
+![Reportes](https://res.cloudinary.com/dafsjo7al/image/upload/v1757337849/Macbook-Air-prevalentware-technical-test.vercel.app_5_pnzba2.png)
 
 ---
 
@@ -59,6 +59,8 @@ Crea un archivo `.env` en la raíz del proyecto con tus credenciales. Puedes usa
 | `NODE_ENV` | Entorno de ejecución | `development` o `production` |
 
 ---
+
+> **Nota:** La variable `NEXT_PUBLIC_API_KEY` es una **API Key personalizada** para esta aplicación. Actúa como una **segunda capa de seguridad** y es **obligatoria** para interactuar con la API.
 
 ### 4️⃣ Generar Prisma Client
 ```bash
@@ -109,6 +111,6 @@ npm run dev
 ## 📄 Documentación
 
 Toda la **documentación de la API** se encuentra disponible en:  
-**[http://localhost:3000/docs](https://asset.cloudinary.com/dafsjo7al/af6fb78fcdc41d2fc725a2918b81bd66)**
+**[http://localhost:3000/docs](https://res.cloudinary.com/dafsjo7al/image/upload/v1757339276/Macbook-Air-prevalentware-technical-test.vercel.app_6_uqbssl.png)**
 
 ---
