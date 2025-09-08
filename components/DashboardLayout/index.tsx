@@ -1,0 +1,104 @@
+'use client';
+
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarProvider,
+  SidebarTrigger,
+} from '@/components/ui/sidebar';
+import { Menu } from 'lucide-react';
+import Link from 'next/link';
+import { Logo } from '@/components/Logo';
+import { LogoutButton } from '@/components/Auth/LogoutButton';
+import { authClient } from '@/lib/auth/client';
+import { MENU_ITEMS } from '@/constants';
+import { useUserStore } from '@/store/userStore';
+import { getRoleLabel } from '@/utils/roles';
+
+export function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const { user } = useUserStore();
+  const { data: session } = authClient.useSession();
+
+  return (
+    <SidebarProvider>
+      <div className='flex min-h-screen w-full'>
+        {/* Sidebar */}
+        <Sidebar className='border-r border-gray-200 bg-gray-50'>
+          <div className='flex flex-col h-full'>
+            <SidebarHeader className='p-6 border-b border-gray-200'>
+              <Logo />
+            </SidebarHeader>
+
+            <SidebarContent className='p-4 flex-1'>
+              <SidebarMenu>
+                {MENU_ITEMS.filter((item) =>
+                  item.roles.includes(user?.role.name ?? '')
+                ).map((item) => (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      asChild
+                      className='w-full justify-start p-3 mb-2 hover:bg-emerald-50 hover:text-emerald-700 transition-colors'
+                    >
+                      <Link
+                        href={item.href}
+                        className='flex items-center gap-3'
+                      >
+                        <item.icon className='h-5 w-5' />
+                        <span className='font-medium'>{item.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarContent>
+
+            <div className='p-4 border-t border-gray-200 mt-auto'>
+              <LogoutButton />
+            </div>
+          </div>
+        </Sidebar>
+
+        {/* Main Content */}
+        <div className='flex-1 flex flex-col'>
+          <header className='border-b border-gray-200 bg-white px-6 py-4 flex items-center justify-between'>
+            <div className='flex items-center gap-4'>
+              <SidebarTrigger className='lg:hidden'>
+                <Menu className='h-6 w-6' />
+              </SidebarTrigger>
+              <h1 className='text-2xl font-bold text-gray-900'>
+                Panel de Control
+              </h1>
+            </div>
+
+            {session?.user && (
+              <div className='flex items-center gap-3'>
+                <div className='text-right'>
+                  <p className='text-sm text-gray-500'>¡Hola 👋!</p>
+                  <p className='text-base font-semibold text-gray-800'>
+                    {session.user.name}
+                  </p>
+                  <p className='text-xs text-gray-400'>
+                    {getRoleLabel(user?.role.name)}
+                  </p>
+                </div>
+                {session.user.image && (
+                  <img
+                    src={session.user.image}
+                    alt={session.user.name}
+                    className='w-10 h-10 rounded-full border border-gray-200 shadow-sm'
+                  />
+                )}
+              </div>
+            )}
+          </header>
+
+          <main className='flex-1 p-6 bg-gray-50'>{children}</main>
+        </div>
+      </div>
+    </SidebarProvider>
+  );
+}

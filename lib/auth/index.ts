@@ -1,7 +1,7 @@
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { prisma } from '@/lib/prisma';
-// import { User } from '@prisma/client';
+import { nextCookies } from 'better-auth/next-js';
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -21,6 +21,11 @@ export const auth = betterAuth({
       role: { type: 'string' },
     },
   },
+  session: {
+    // 1 día en segundos
+    expiresIn: 60 * 60 * 24,
+  },
+  plugins: [nextCookies()],
 });
 
 export type Session = typeof auth.$Infer.Session;

@@ -10,7 +10,7 @@ export async function withAuth(
 
   // Validar API Key en los headers
   const apiKey = reqHeaders.get('x-api-key');
-  if (!apiKey || apiKey !== process.env.API_KEY) {
+  if (!apiKey || apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
     return {
       authorized: false,
       response: Response.json({ message: 'Invalid API Key' }, { status: 401 }),
@@ -45,7 +45,13 @@ export async function withAuth(
   if (!user || !user.role) {
     return {
       authorized: false,
-      response: Response.json({ message: 'Forbidden' }, { status: 403 }),
+      response: Response.json(
+        {
+          message:
+            'You do not have permission to access this resource. Forbidden.',
+        },
+        { status: 403 }
+      ),
     };
   }
 

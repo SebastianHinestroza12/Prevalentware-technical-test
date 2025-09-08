@@ -17,6 +17,8 @@ model User {
   id        String    @id @default(cuid())
   name      String
   email     String    @unique
+  image     String?
+  emailVerified Boolean @default(false)
   phone     String?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -109,7 +111,7 @@ model Verification {
 model Movement {
   id        String   @id @default(cuid())
   concept   String
-  amount    Float
+  amount    Int
   date      DateTime
   userId    String
   type      MovementType
