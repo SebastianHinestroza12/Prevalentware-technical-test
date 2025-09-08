@@ -5,9 +5,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   typescript: { ignoreBuildErrors: true },
-  experimental: {
-    outputFileTracing: true,
-  },
+  outputFileTracingExcludes: { "/api/docs": ["./.next/cache/**/*"] },
 };
 
 export default nextConfig;
