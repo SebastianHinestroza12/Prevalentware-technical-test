@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+const { prisma } = await import('@/lib/prisma');
 
 /**
  * POST => asegurar que el usuario tenga rol (si no, asigna ADMIN)

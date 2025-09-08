@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+const { prisma } = await import('@/lib/prisma');
 
 export async function GET() {
   try {

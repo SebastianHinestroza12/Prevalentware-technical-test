@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+const { prisma } = await import('@/lib/prisma');
 import { withAuth } from '@/lib/middleware/authMiddleware';
 
 export const GET = async (req: Request) => {

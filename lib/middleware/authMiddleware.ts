@@ -1,6 +1,6 @@
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
-import { prisma } from '@/lib/prisma';
+const { prisma } = await import('@/lib/prisma');
 
 export async function withAuth(
   req: Request,
