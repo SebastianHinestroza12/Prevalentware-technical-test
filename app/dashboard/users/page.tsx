@@ -15,13 +15,14 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Edit } from 'lucide-react';
 import { User } from '@/interfaces';
+import { TableSkeleton } from '@/components/Skeleton/TableSkeleton';
 
 export default function UsersPage() {
   const { data: users, isLoading, refetch } = useUsers();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   if (isLoading) {
-    return <p className='text-center text-gray-600'>Cargando usuarios...</p>;
+    return <TableSkeleton rows={5} />;
   }
 
   return (

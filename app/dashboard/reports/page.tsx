@@ -4,7 +4,6 @@ import { useReports } from '@/hooks/useReports';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
-  Loader2,
   Download,
   Users,
   TrendingUp,
@@ -29,15 +28,12 @@ import { downloadCSV } from '@/utils/csv';
 import { motion } from 'framer-motion';
 import { formatCurrency } from '@/utils/currency';
 import { fadeIn, fadeInUp, staggerContainer } from '@/utils/animations';
+import { ReportsSkeleton } from '@/components/Skeleton/ReportsSkeleton';
 export default function ReportsPage() {
   const { data, isLoading, isError } = useReports();
 
   if (isLoading) {
-    return (
-      <div className='flex justify-center items-center h-64'>
-        <Loader2 className='w-8 h-8 animate-spin text-emerald-600' />
-      </div>
-    );
+    return <ReportsSkeleton />;
   }
 
   if (isError) {

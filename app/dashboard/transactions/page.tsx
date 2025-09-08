@@ -36,6 +36,7 @@ import {
 } from '@/schemas/movement.schema';
 import { useUserMovements } from '@/hooks/useUserMovements';
 import { useUserStore } from '@/store/userStore';
+import { TableSkeleton } from '@/components/Skeleton/TableSkeleton';
 
 export default function TransaccionesPage() {
   const { data: session, isPending } = authClient.useSession();
@@ -95,7 +96,7 @@ export default function TransaccionesPage() {
     }
   };
 
-  if (isPending || isLoading) return <p>Cargando...</p>;
+  if (isPending || isLoading) return <TableSkeleton rows={5} />;
 
   return (
     <div className='p-6 space-y-6 bg-gray-50 min-h-screen'>
