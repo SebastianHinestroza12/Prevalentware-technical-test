@@ -3,8 +3,17 @@ import { prismaAdapter } from 'better-auth/adapters/prisma';
 const { prisma } = await import('@/lib/prisma');
 import { nextCookies } from 'better-auth/next-js';
 
+const githubClientId =
+  process.env.NODE_ENV === 'production'
+    ? process.env.GITHUB_CLIENT_ID_PROD
+    : process.env.GITHUB_CLIENT_ID;
+
+const githubClientSecret =
+  process.env.NODE_ENV === 'production'
+    ? process.env.GITHUB_CLIENT_SECRET_PROD
+    : process.env.GITHUB_CLIENT_SECRET;
+
 export const auth = betterAuth({
-  baseURL: process.env.VERCEL_URL!,
   secret: process.env.BETTER_AUTH_SECRET!,
   database: prismaAdapter(prisma, {
     provider: 'postgresql',
@@ -14,8 +23,8 @@ export const auth = betterAuth({
   },
   socialProviders: {
     github: {
-      clientId: process.env.GITHUB_CLIENT_ID as string,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+      clientId: githubClientId as string,
+      clientSecret: githubClientSecret as string,
     },
   },
   user: {
