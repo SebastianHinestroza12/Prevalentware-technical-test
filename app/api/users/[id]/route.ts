@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+const { prisma } = await import('@/lib/prisma');
 import { withAuth } from '@/lib/middleware/authMiddleware';
 import { validateSchema } from '@/lib/validateSchema';
 import { updateUserSchema } from '@/schemas/user.schema';
