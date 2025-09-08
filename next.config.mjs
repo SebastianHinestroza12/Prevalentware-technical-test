@@ -5,6 +5,9 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   typescript: { ignoreBuildErrors: true },
+  experimental: {
+    outputFileTracing: true,
+  },
 };
 
 export default nextConfig;
