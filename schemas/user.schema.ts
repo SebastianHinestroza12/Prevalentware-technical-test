@@ -8,3 +8,10 @@ export const updateUserSchema = z.object({
     .optional(),
   roleId: z.string().min(1, 'Invalid role ID format').optional(),
 });
+
+export const editUserSchema = z.object({
+  name: z.string().min(2, 'El nombre es requerido'),
+  roleId: z.string().min(1, 'El rol es requerido'),
+});
+
+export type EditUserFormData = z.infer<typeof editUserSchema>;
