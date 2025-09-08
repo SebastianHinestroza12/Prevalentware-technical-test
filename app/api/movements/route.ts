@@ -103,12 +103,13 @@ export const PUT = async (req: Request) => {
     const { exists, response } = await ensureMovementExists(id);
     if (!exists) return response;
 
-    const updatedMovement = await prisma.$transaction(async (tx) => {
-      return await tx.movement.update({
-        where: { id },
-        data: { ...data, date: data.date ? new Date(data.date) : undefined },
-      });
-    });
+    const updatedMovement = await prisma.$transaction(
+      async (tx) =>
+        await tx.movement.update({
+          where: { id },
+          data: { ...data, date: data.date ? new Date(data.date) : undefined },
+        })
+    );
 
     return Response.json({ data: updatedMovement });
   } catch (error) {

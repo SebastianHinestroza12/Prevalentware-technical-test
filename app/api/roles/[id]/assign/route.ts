@@ -3,13 +3,9 @@ import { prisma } from '@/lib/prisma';
 /**
  * POST => asegurar que el usuario tenga rol (si no, asigna ADMIN)
  */
-export const POST = async (
-  req: Request,
-  { params }: { params: { id: string } }
-) => {
-
+export async function POST(req: Request, context: any) {
   try {
-    const { id } = params;
+    const { id } = context.params;
 
     const user = await prisma.user.findUnique({
       where: { id },
@@ -38,4 +34,4 @@ export const POST = async (
     console.error('Error ensuring user role:', error);
     return Response.json({ message: 'Internal Server Error' }, { status: 500 });
   }
-};
+}

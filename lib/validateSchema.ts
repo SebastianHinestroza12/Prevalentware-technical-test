@@ -11,7 +11,7 @@ export function validateSchema<T>(
   const result = schema.safeParse(data);
 
   if (!result.success) {
-    const fieldErrors = result.error.flatten().fieldErrors;
+    const { fieldErrors } = result.error.flatten();
 
     const normalizedErrors: Record<string, string[]> = {};
     for (const key in fieldErrors) {

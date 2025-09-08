@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { LoginForm } from '@/components/Auth/LoginForm';
 import { Logo } from '@/components/Logo';

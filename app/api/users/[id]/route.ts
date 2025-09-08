@@ -3,16 +3,13 @@ import { withAuth } from '@/lib/middleware/authMiddleware';
 import { validateSchema } from '@/lib/validateSchema';
 import { updateUserSchema } from '@/schemas/user.schema';
 
-type RouteParams = {
-  params: { id: string };
-};
-
-export const GET = async (req: Request, { params }: RouteParams) => {
+// GET user
+export async function GET(req: Request, context: any) {
   const authCheck = await withAuth(req, ['users:read']);
   if (!authCheck.authorized) return authCheck.response;
 
   try {
-    const { id } = params;
+    const { id } = context.params;
 
     if (!id) {
       return Response.json({ message: 'User ID is required' }, { status: 400 });
@@ -32,17 +29,15 @@ export const GET = async (req: Request, { params }: RouteParams) => {
     console.error('Error fetching users:', error);
     return Response.json({ message: 'Internal Server Error' }, { status: 500 });
   }
-};
+}
 
-export const PUT = async (
-  req: Request,
-  { params }: { params: { id: string } }
-) => {
+// PUT user
+export async function PUT(req: Request, context: any) {
   const authCheck = await withAuth(req, ['users:update']);
   if (!authCheck.authorized) return authCheck.response;
 
   try {
-    const id = params.id;
+    const { id } = context.params;
 
     if (!id) {
       return Response.json({ message: 'User ID is required' }, { status: 400 });
@@ -55,7 +50,6 @@ export const PUT = async (
     }
 
     let body;
-
     try {
       body = await req.json();
     } catch {
@@ -88,5 +82,4 @@ export const PUT = async (
     console.error('Error updating user:', error);
     return Response.json({ message: 'Internal Server Error' }, { status: 500 });
   }
-};
-
+}

@@ -6,8 +6,8 @@ import { MovementsService } from '@/services/movements.service';
 import { MovementResponse } from '@/interfaces';
 import { MovementFormData } from '@/schemas/movement.schema';
 
-export const useCreateMovement = () => {
-  return useMutation<MovementResponse, Error, MovementFormData>({
+export const useCreateMovement = () =>
+  useMutation<MovementResponse, Error, MovementFormData>({
     mutationFn: (data) => MovementsService.createMovement(data),
     onSuccess: () => {
       toast.success('Movimiento creado con éxito');
@@ -16,4 +16,3 @@ export const useCreateMovement = () => {
       toast.error(error.message || 'Error al crear movimiento');
     },
   });
-};
