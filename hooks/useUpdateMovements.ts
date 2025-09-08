@@ -6,8 +6,8 @@ import { MovementsService } from '@/services/movements.service';
 import { MovementResponse } from '@/interfaces';
 import { MovementFormData } from '@/schemas/movement.schema';
 
-export const useUpdateMovement = () => {
-  return useMutation<
+export const useUpdateMovement = () =>
+  useMutation<
     MovementResponse,
     Error,
     Partial<MovementFormData> & { id: string }
@@ -20,4 +20,3 @@ export const useUpdateMovement = () => {
       toast.error(error.message || 'Error al actualizar movimiento');
     },
   });
-};

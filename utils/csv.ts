@@ -1,4 +1,4 @@
-import { ReportsService } from "@/services/reports.service";
+import { ReportsService } from '@/services/reports.service';
 
 export async function downloadCSV() {
   try {

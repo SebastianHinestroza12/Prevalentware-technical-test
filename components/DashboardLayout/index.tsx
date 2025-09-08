@@ -19,7 +19,11 @@ import { MENU_ITEMS } from '@/constants';
 import { useUserStore } from '@/store/userStore';
 import { getRoleLabel } from '@/utils/roles';
 
-export function DashboardLayout({ children }: { children: React.ReactNode }) {
+export const DashboardLayout = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const { user } = useUserStore();
   const { data: session } = authClient.useSession();
 
@@ -101,4 +105,4 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       </div>
     </SidebarProvider>
   );
-}
+};

@@ -18,7 +18,7 @@ export default function Home() {
       const session = await authClient.getSession();
 
       if (session?.data?.user?.id) {
-        const id = session.data.user.id;
+        const { id } = session.data.user;
 
         // Asegurar rol
         try {
