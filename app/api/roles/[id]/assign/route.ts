@@ -5,7 +5,7 @@ const { prisma } = await import('@/lib/prisma');
  */
 export async function POST(req: Request, context: any) {
   try {
-    const { id } = context.params;
+    const { id } = await context.params;
 
     const user = await prisma.user.findUnique({
       where: { id },
