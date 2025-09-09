@@ -82,7 +82,6 @@ npx prisma db seed
 npm run dev
 ```
 - La aplicación estará disponible en: **[http://localhost:3000](http://localhost:3000)**  
-- La documentación de la API se encuentra en: **[http://localhost:3000/docs](http://localhost:3000/docs)**
 
 ---
 
@@ -105,6 +104,34 @@ npm run dev
 - **Recharts** (Gráficos de reportes)  
 - **React Query**  
 - **Zod** (Validaciones)  
+
+---
+
+## ✅ Tests
+
+El proyecto incluye un conjunto de **tests automatizados** para verificar el correcto funcionamiento de la API y la lógica principal.  
+Estos tests se encuentran en la carpeta `__tests__` y están construidos con **Jest**, usando mocks de Prisma y autenticación para simular la base de datos y la seguridad sin necesidad de conectarse a servicios externos.  
+
+![Tests](https://res.cloudinary.com/dafsjo7al/image/upload/v1757430273/Captura_de_pantalla_2025-09-09_095454_s8q1e2.png)
+
+
+### 🔹 Ejecutar tests
+Para correr los tests, puedes usar cualquiera de los siguientes comandos:
+
+```bash
+# Ejecutar todos los tests
+npm run test
+
+# Ejecutar en modo watch (ideal durante el desarrollo)
+npm run test:watch
+
+# Ejecutar con reporte de cobertura
+npm run test:coverage
+
+# Ejecutar en CI/CD (modo continuo)
+npm run test:ci
+
+```
 
 ---
 
