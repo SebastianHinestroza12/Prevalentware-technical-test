@@ -37,7 +37,7 @@ export async function PUT(req: Request, context: any) {
   if (!authCheck.authorized) return authCheck.response;
 
   try {
-    const { id } = context.params;
+    const { id } = await context.params;
 
     if (!id) {
       return Response.json({ message: 'User ID is required' }, { status: 400 });
